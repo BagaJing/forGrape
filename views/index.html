@@ -1,0 +1,77 @@
+
+<!DOCTYPE HTML>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <link href="../static/css/bootstrap.css"  rel='stylesheet' type='text/css'></link>
+    <link href="../static/css/mystyle.css"  rel='stylesheet' type='text/css'></link>
+    <!--block favicon.ico request-->
+    <link rel="icon" href="data:image/ico;base64,aWNv">
+</head>
+<body>
+ <nav class="navbar navbar-expand-lg navbar-light bg-light">
+    <div class="container">
+        <nav class="navbar navbar-expand-lg navbar-light bg-light">
+          <a class="navbar-brand" href="#">For Grape</a>
+        </nav>
+    </div>
+ </nav>
+ <!--
+    {{#each samples}}
+        <h2>name: {{this.name}}</h2>
+        <h2>age: {{this.age}}</h2>
+    {{/each}}
+ -->
+ <!-- Grid row -->
+<!--Years-->
+<div class="col-md-12 d-flex justify-content-center mb-5">
+    {{#each years}}
+        <a type="button" class="btn btn-outline-black" href="http://localhost:3000/show/{{this}}">{{this}}</a>
+    {{/each}}
+</div>
+<div class="row">
+
+    <!-- Grid column -->
+    <div class="col-md-12 d-flex justify-content-center mb-5">
+  
+      <button type="button" class="btn btn-outline-black waves-effect filter" data-rel="all">All</button>
+      <button type="button" class="btn btn-outline-black waves-effect filter" data-rel="1">You</button>
+      <button type="button" class="btn btn-outline-black waves-effect filter" data-rel="2">We</button>
+  
+    </div>
+    <!-- Grid column -->
+  
+  </div>
+  <!-- Grid row -->
+  
+  <div class="container">
+  <!-- Grid row -->
+    <div class="gallery" id="gallery">
+        <!-- Grid column -->
+        {{#each list}}
+            <div class="mb-3 pics animation all {{this.code}}">
+                <img class="img-fluid bigger" src="../static/images/{{this.name}}" alt="Card image cap">
+            </div>
+        {{/each}}
+    </div>
+  </div>
+  <!-- Grid row -->
+    <script src="../static/js/jquery.js"></script>
+    <script src="../static/js/bootstrap.js"></script>
+    <script src="../static/js/util.js"></script>
+    <script>
+                    $(function() {
+                        var selectedClass = "";
+                        $(".filter").click(function(){
+                        selectedClass = $(this).attr("data-rel");
+                        $("#gallery").fadeTo(100, 0.1);
+                        $("#gallery div").not("."+selectedClass).fadeOut().removeClass('animation');
+                        setTimeout(function() {
+                        $("."+selectedClass).fadeIn().addClass('animation');
+                        $("#gallery").fadeTo(300, 1);
+                        }, 300);
+                        });
+                    });
+    </script>
+</body>
+</html>
