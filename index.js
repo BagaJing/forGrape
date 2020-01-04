@@ -19,7 +19,8 @@ var root = path.join(__dirname+"/public/static/images");
 // decode post
 app.use(bodyParser.urlencoded({extended:false}));
 //decode post file
-
+app.use(multer({dest:'./dist'}).array('file'));
+// get method
 
 function readPics(list,root){
 	//console.log(root);
@@ -52,6 +53,13 @@ function readYear(){
 	});
 	return years;
 }
+//2015-03-08 142337.jpg
+function findDir(filename){
+	// year and month
+	var ym = filename.substring(0,filename.lastIndexOf('-'));
+	if(ym == ''||ym.indexOf('-') == -1) return false;
+	return ym.substring(0,ym.indexOf('-'));
+}
 app.get("/show/:year",function(req,res){
 	var years = readYear();
 	var list = new Array();
@@ -70,8 +78,7 @@ app.get("/show/:year",function(req,res){
 		list
 	});
 });
-//app.use(multer({dest:'./dist'}).array('file'));
-// get method
+
 app.get("/upload",function(req,res){
 	res.render('upload',{
 		layout: false,
@@ -80,32 +87,32 @@ app.get("/upload",function(req,res){
 });
 //post method
 app.post('/upload',function(req,res){
-	console.log(req.files[0].originalname);
-	var name = req.files[0].originalname;
-	fs.readFile(req.files[0].path,function(err,data){
-		if(err){
-			console.log('Error');
-			res.send('upload failed');
+	for(var i = 0 ; i < req.files.length; i++){
+		var name = req.files[i].originalname;
+		var data = fs.readFileSync(req.files[i].path);
+		var year = findDir(name);
+		console.log(year);
+		if(fs.existsSync(__dirname+'/'+'public/static/images/'+year)){
+			console.log('dir '+year+' exist');
 		} else{
-			var dir = __dirname+'/'+'public/static/images'+'/2017'+'/'+req.files[0].originalname;
-			fs.writeFile(dir,data,function(err){
-				var unit = {
-					filename: req.files[0].originalname,
-					dir: dir
-				}
-				console.log(unit);
-			});
-			var cache = fs.readdirSync('./dist');
-			cache.forEach(function(ele,index){
-				fs.unlink('./dist'+'/'+ele,function(err){
-					if(err)
-						throw err;
-					console.log('cache '+ele+' deleted');
-				});
-			});
-			res.send('upload completed');
+			fs.mkdirSync(__dirname+'/'+'public/static/images/'+year);
+			console.log('dir '+year+' created')
 		}
+		var dir = __dirname+'/'+'public/static/images'+'/'+year+'/'+name;
+		fs.writeFileSync(dir,data);
+	}
+	
+	var cache = fs.readdirSync('./dist');
+	cache.forEach(function(ele,index){
+		fs.unlink('./dist'+'/'+ele,function(err){
+			if(err)
+				throw err;
+			console.log('cache '+ele+' deleted');
+		});
 	});
+	
+	//res.send('upload completed');
+	res.redirect('/upload');
 	
 });
 var server = app.listen(3000,function(){
